@@ -1,0 +1,38 @@
+
+- name: |
+    "5.2 | PATCH | Ensure Print Spooler (Spooler) is set to Disabled Member Server"
+  block:
+      - name: "5.1 & 5.2 | PATCH | Ensure Print Spooler (Spooler) is set to Disabled | Check to see if Spooler service exists."
+        ansible.windows.win_service_info:
+            name: Spooler
+        register: spooler_service_info
+      - name: "5.1 & 5.2 | PATCH | Ensure Print Spooler (Spooler) is set to Disabled | RegEdit"
+        ansible.windows.win_regedit:
+            path: HKLM:\SYSTEM\CurrentControlSet\Services\Spooler
+            name: Start
+            data: 4
+            type: dword
+      - name: "5.2 | PATCH | Ensure Print Spooler (Spooler) is set to Disabled | Service"
+        ansible.windows.win_service:
+            name: Spooler
+            start_mode: disabled
+            state: stopped
+        when: spooler_service_info.exists
+  tags:
+      - rule_5.2
+      - patch
+      - printer
+
+# - name: "2.2.21 | PATCH | Ensure Deny access to this computer from the network to include Guests Local account and member of Administrators group MS only | Member Server"
+#   ansible.windows.win_user_right:
+#       name: SeDenyNetworkLogonRight
+#       users:
+#           - Guests
+#           - Local Account
+#           - Administrators
+#       action: add
+#   tags:
+#       - level1-memberserver
+#       - rule_2.2.21
+#       - patch
+#       - userrights

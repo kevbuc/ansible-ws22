@@ -1,0 +1,46 @@
+# - name: Check OS version and family
+#   ansible.builtin.assert:
+#       that:
+#           - ansible_os_family == 'Windows'
+#           - ansible_distribution | regex_search('(Microsoft Windows Server 2022)')
+#       success_msg: "{{ ansible_distribution }} {{ ansible_distribution_major_version }} is the detected operating system."
+#       fail_msg: "This role can only be run against Windows Server 2022 Editions. {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
+#   tags:
+#       - always
+
+# - name: Check ansible version
+#   ansible.builtin.assert:
+#       that: ansible_version.full is version_compare(min_ansible_version, '>=')
+#       msg: You must use Ansible {{ min_ansible_version }} or greater
+#   tags:
+#       - always
+
+---
+- name: "Apply Windows security settings"
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: "Include firewall tasks"
+      import_tasks: firewall.yml
+
+    - name: "Include account tasks"
+      import_tasks: accounts.yml
+
+    - name: "Include policy tasks"
+      import_tasks: policies.yml
+
+    - name: "Include access tasks"
+      import_tasks: access.yml
+
+    - name: "Include audit tasks"
+      import_tasks: audit.yml
+
+    - name: "Include user tasks"
+      import_tasks: users.yml
+
+    - name: "Include print tasks"
+      import_tasks: print.yml
+
+    # - name: "Test"
+    #   import_tasks: test.yml
